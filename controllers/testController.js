@@ -10,7 +10,6 @@ export const getTestHandler = (req, res) => {
 }
 
 export const postTestHandler = (req, res) => {
-    console.log(req.body)
     let responseCode = 200;
     res.header({
         "X-Powered-By": "Rishav",

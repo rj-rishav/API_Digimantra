@@ -4,8 +4,10 @@ import bodyParser from "body-parser";
 import { configDotenv } from "dotenv";
 import dbConnectionHandler from "./connection.js"
 import testRouter from "./routes/testRoute.js";
+import authRouter from "./routes/authRoute.js";
 import userRouter from "./routes/userRoute.js";
 import noPathMiddleware from "./middlewares/noPathMiddleware.js";
+import validateJwt from "./middlewares/validateJwt.js";
 
 dbConnectionHandler();
 
@@ -18,10 +20,16 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
 
-app.use('/user', userRouter);
+app.use('/test',testRouter);
+
+// JWT token validation
+app.use(validateJwt)
 
 // Test route
-app.use('/test',testRouter);
+
+app.use('/auth', authRouter)
+
+app.use('/user', userRouter);
 
 // Handle Unknown URLS 404
 app.use('*',noPathMiddleware);
