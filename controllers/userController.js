@@ -1,5 +1,6 @@
 import { UserModel } from "../models/UserModel.js";
 import { cleanObject } from "../utils/cleanObject.js";
+import path from "path";
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -10,7 +11,7 @@ export const getAllUsers = async (req, res) => {
             message: response.map((obj) => cleanObject(obj, ["name", "userName", "age"])),
         });
     } catch (error) {
-        console.log(error);
+        console.error(path.relative(process.cwd(), new URL(import.meta.url).pathname), error);
         res.status(500).send({
             response_code: 500,
             message: "Something went wrong!",
@@ -36,7 +37,7 @@ export const getUserByUsername = async (req, res) => {
             message: cleanObject(response, ["name", "userName", "age"]),
         });
     } catch (error) {
-        console.log(error);
+        console.error(path.relative(process.cwd(), new URL(import.meta.url).pathname), error);
         res.status(500).send({
             response_code: 500,
             message: "Something went wrong!",
@@ -53,7 +54,7 @@ export const createUser = async (req, res) => {
             message: "User created successfully!",
         });
     } catch (error) {
-        console.error(path.relative(), error);
+        console.error(path.relative(process.cwd(), new URL(import.meta.url).pathname), error);
         res.status(422).send({
             response_code: 422,
             message: "Username already exists!",
@@ -71,7 +72,7 @@ export const updateUser = async (req, res) => {
             message: "User updated successfully!",
         });
     } catch (error) {
-        console.error(path.relative(), error);
+        console.error(path.relative(process.cwd(), new URL(import.meta.url).pathname), error);
         res.status(422).send( );
     }
 };

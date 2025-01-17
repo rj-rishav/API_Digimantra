@@ -3,16 +3,17 @@ import { encrypt } from "../utils/crypt.js";
 import { signJwt } from "../utils/jwt.js";
 
 import mailSender from '../utils/mailSender.js'
+import path from 'path';
 
 export async function signupHandler(req, res) {
     let response = await UserModel.findOne({
         userName: req.body?.userName,
-    });
+    }).lean(); // lean() is used to convert mongoose object to plain object
 
     if (response) {
         res.status(409).send({
             response_code: 409,
-            message: "User alreadyy exists!",
+            message: "User already exists!",
         });
         return;
     }
@@ -26,7 +27,7 @@ export async function signupHandler(req, res) {
             message: "User created successfully!",
         });
     } catch (error) {
-        console.error(path.relative(), error);
+        console.error(path.relative(process.cwd(), new URL(import.meta.url).pathname), error);
         res.status(500).send({
             response_code: 500,
             message: "Cannot create user, something went wrong!",
@@ -50,7 +51,7 @@ export async function signinHandler(req, res) {
     if (encrypt(userData["password"]) === response.password) {
         if(!req.cookies['access-token'])
             res.cookie('access-token', signJwt({userName: userData.userName}) || "not set")
-        // mailSender('signin', response.email)
+        mailSender('signin', response.email)
         res.status(200).send({
             response_code: 200,
             message: "User verified successfully!",
