@@ -2,7 +2,7 @@ import { validateUser } from "../models/UserModel.js";
 
 export const validator = (req, res, next) => {
     let { error } = validateUser(req.body);
-    console.error(error);
+    console.error("ERROR", error);
     if (error)
         res.status(422).send({
             response_code: 422,

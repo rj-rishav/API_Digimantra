@@ -1,5 +1,8 @@
 import { UserModel } from "../models/UserModel.js";
 import { encrypt } from "../utils/crypt.js";
+import { signJwt } from "../utils/jwt.js";
+
+import mailSender from '../utils/mailSender.js'
 
 export async function signupHandler(req, res) {
     let response = await UserModel.findOne({
@@ -17,6 +20,7 @@ export async function signupHandler(req, res) {
     userData["password"] = encrypt(userData["password"]);
     try {
         await UserModel.create(userData);
+        mailSender('signup', req.body?.email);
         res.status(201).send({
             response_code: 201,
             message: "User created successfully!",
@@ -43,11 +47,15 @@ export async function signinHandler(req, res) {
         return;
     }
     let userData = req.body;
-    if (encrypt(userData["password"]) === response.password)
+    if (encrypt(userData["password"]) === response.password) {
+        if(!req.cookies['access-token'])
+            res.cookie('access-token', signJwt({userName: userData.userName}) || "not set")
+        // mailSender('signin', response.email)
         res.status(200).send({
             response_code: 200,
             message: "User verified successfully!",
         });
+    }
     else {
         res.status(401).send({
             response_code: 401,

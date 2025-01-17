@@ -1,9 +1,32 @@
-import { verifyJwt } from '../utils/jwt.js'
+import { verifyJwt } from "../utils/jwt.js";
 
 export default function validateJwt(req, res, next) {
-    if(req.headers['access-token'])
-        if(verifyJwt(req.headers['access-token']))
-            next()
-        else
-            res.status(106).json({response_code: 106, message: "Validation of the authentication token's signature failed!"})
+    try {
+        const token = req.cookies["access-token"];
+        
+        if (!token) {
+            return res.status(401).json({
+                response_code: 401,
+                message: "No authentication token found. Please login to continue."
+            });
+        }
+
+        try {
+            const decoded = verifyJwt(token);
+            req.user = decoded; // Attach decoded user info to request
+            return next();
+        } catch (tokenError) {
+            return res.status(403).json({
+                response_code: 403,
+                message: "Invalid or expired authentication token. Please login again."
+            });
+        }
+
+    } catch (error) {
+        console.error("JWT Validation Error:", error);
+        return res.status(500).json({
+            response_code: 500,
+            message: "Internal server error during authentication."
+        });
+    }
 }

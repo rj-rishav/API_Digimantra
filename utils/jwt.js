@@ -5,7 +5,8 @@ import jsonwebtoken from "jsonwebtoken"
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export function signJwt(payload) {
-    return  jsonwebtoken.sign(payload, JWT_SECRET);
+    payload.iat = Date.now()
+    return  jsonwebtoken.sign(payload, JWT_SECRET, {expiresIn: '1d'});
 }
 
 export function verifyJwt(token) {
