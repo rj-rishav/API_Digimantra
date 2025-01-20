@@ -5,7 +5,6 @@ import path from "path";
 export const getAllUsers = async (req, res) => {
     try {
         let response = await UserModel.find({});
-        console.log(response)
         res.status(200).send({
             response_code: 200,
             message: response.map((obj) => cleanObject(obj, ["name", "userName", "age"])),
@@ -66,7 +65,6 @@ export const updateUser = async (req, res) => {
     const userData = req.body;
     try {
         let response = await UserModel.findOneAndUpdate(req?.params,userData);
-        console.log(response)
         res.status(201).send({
             response_code: 201,
             message: "User updated successfully!",

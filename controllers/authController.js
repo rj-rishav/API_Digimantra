@@ -2,8 +2,8 @@ import { UserModel } from "../models/UserModel.js";
 import { encrypt } from "../utils/crypt.js";
 import { signJwt } from "../utils/jwt.js";
 
-import mailSender from '../utils/mailSender.js'
-import path from 'path';
+import mailSender from "../utils/mailSender.js";
+import path from "path";
 
 export async function signupHandler(req, res) {
     let response = await UserModel.findOne({
@@ -21,13 +21,16 @@ export async function signupHandler(req, res) {
     userData["password"] = encrypt(userData["password"]);
     try {
         await UserModel.create(userData);
-        mailSender('signup', req.body?.email);
+        mailSender("signup", req.body?.email);
         res.status(201).send({
             response_code: 201,
             message: "User created successfully!",
         });
     } catch (error) {
-        console.error(path.relative(process.cwd(), new URL(import.meta.url).pathname), error);
+        console.error(
+            path.relative(process.cwd(), new URL(import.meta.url).pathname),
+            error
+        );
         res.status(500).send({
             response_code: 500,
             message: "Cannot create user, something went wrong!",
@@ -49,15 +52,21 @@ export async function signinHandler(req, res) {
     }
     let userData = req.body;
     if (encrypt(userData["password"]) === response.password) {
-        if(!req.cookies['access-token'])
-            res.cookie('access-token', signJwt({userName: userData.userName}) || "not set")
-        mailSender('signin', response.email)
+        if (!req.cookies["access-token"])
+            res.cookie(
+                "access-token",
+                signJwt({ userName: userData.userName }) || "not set",
+                {
+                    expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+                    httpOnly: true,
+                }
+            );
+        mailSender("signin", response.email);
         res.status(200).send({
             response_code: 200,
             message: "User verified successfully!",
         });
-    }
-    else {
+    } else {
         res.status(401).send({
             response_code: 401,
             message: "Password is incorrect!",
